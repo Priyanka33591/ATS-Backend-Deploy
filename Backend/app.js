@@ -1,3 +1,4 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
@@ -15,8 +16,9 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+require('dotenv').config();
 
-const genAI = new GoogleGenerativeAI("AIzaSyAlItNEwd-37MT2WSk-q-XPeDOzjt8I0XI");
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 async function getGeminiResponse(prompt) {
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
