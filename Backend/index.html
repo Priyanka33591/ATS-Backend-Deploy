@@ -65,13 +65,13 @@
                 if (response.ok) {
                     const { atsScore, missingKeywords, suggestions, summary } = result;
                     responseElement.textContent = `
-                         ${atsScore}
+                         ATS Score: ${atsScore}
 
-                         ${missingKeywords}
+                         Missing KeyWords: ${missingKeywords}
 
-                        ${suggestions}
+                        Suggestions: ${suggestions}
 
-                         ${summary}
+                        Summary: ${summary}
                     `;
                 } else {
                     responseElement.textContent = `Error: ${result.error}`;

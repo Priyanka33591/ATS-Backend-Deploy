@@ -49,8 +49,6 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       Resume: ${pdfText.text}
       Job Description: ${jd}
 
-      Provide the response in the following format:
-      ATS Score: % 
     `;
     const atsScore = await getGeminiResponse(atsScorePrompt);
 
@@ -61,20 +59,16 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
       Resume: ${pdfText.text}
       Job Description: ${jd}
 
-      Provide the response in the following format:
-      Missing Keywords:
     `;
     const missingKeywords = await getGeminiResponse(missingKeywordsPrompt);
 
     const suggestionsPrompt = `
       Give some suggestions to the user to improve the resume in  3-4 points only. IN 25 WORDS ONLY . USE BOOLET INSTEAD OF **.
-      IMPORTANT - REMOVE **
+      IMPORTANT - REMOVE '**'
 
       Resume: ${pdfText.text}
       Job Description: ${jd}
 
-      Provide the response in the following format:
-      Suggestions:
     `;
     const suggestions = await getGeminiResponse(suggestionsPrompt);
 
@@ -83,8 +77,6 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
 
       Resume: ${pdfText.text}
 
-      Provide the response in the following format:
-      Summary:
     `;
     const summary = await getGeminiResponse(summaryPrompt);
 
