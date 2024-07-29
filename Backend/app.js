@@ -53,8 +53,15 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const atsScore = await getGeminiResponse(atsScorePrompt);
 
     const missingKeywordsPrompt = `
-      Identify any missing keywords with high accuracy from the resume compared to the job description. show only 5 missing keywords. USE BOOLET INSTEAD OF **.
+      Firstly change the line.
+
+      Identify any missing keywords with high accuracy from the resume compared to the job description. 
+      show only 5 missing keywords. 
+      USE BOOLET INSTEAD OF **.
+
       SHOW ONLY MOST RELVENT MISSING KEYWORDS , DEPENDS ON JOB DESCRIPTION . USE MISSING SKILLS FOR MISSING KEYWORDS DEPENDS ON JOB DESCRIPTION.
+
+      IMPORTANT - REMOVE '**' IN ALL TEXT
 
       Resume: ${pdfText.text}
       Job Description: ${jd}
@@ -63,8 +70,11 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const missingKeywords = await getGeminiResponse(missingKeywordsPrompt);
 
     const suggestionsPrompt = `
-      Give some suggestions to the user to improve the resume in  3-4 points only. IN 25 WORDS ONLY . USE BOOLET INSTEAD OF **.
-      IMPORTANT - REMOVE '**'
+      Firstly break the line.
+      Give some suggestions to the user to improve the resume in  3-4 points only. 
+      IN 25 WORDS ONLY . 
+      USE BOOLET INSTEAD OF speacial characters.
+      IMPORTANT - REMOVE '**' IN ALL TEXT AND PLEASE BOLD THE HEADINDS
 
       Resume: ${pdfText.text}
       Job Description: ${jd}
@@ -73,6 +83,7 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const suggestions = await getGeminiResponse(suggestionsPrompt);
 
     const summaryPrompt = `
+      Firstly break the line.
       Give a very small summary of the resume. IN 50 WORDS
 
       Resume: ${pdfText.text}
