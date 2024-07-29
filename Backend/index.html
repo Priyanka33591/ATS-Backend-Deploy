@@ -21,8 +21,8 @@
           100% { transform: rotate(360deg); }
       }
       #response {
-            white-space: pre-wrap;
-        }
+          white-space: pre-wrap;
+      }
   </style>
 </head>
 <body>
@@ -40,38 +40,47 @@
     <pre id="response"></pre>
     
     <script>
-      document.getElementById('resumeForm').addEventListener('submit', async (event) => {
-          event.preventDefault();
-          
-          const formData = new FormData();
-          formData.append('jd', document.getElementById('jd').value);
-          formData.append('resume', document.getElementById('resume').files[0]);
+        document.getElementById('resumeForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('jd', document.getElementById('jd').value);
+            formData.append('resume', document.getElementById('resume').files[0]);
 
-          const loadingElement = document.getElementById('loading');
-          const responseElement = document.getElementById('response');
+            const loadingElement = document.getElementById('loading');
+            const responseElement = document.getElementById('response');
 
-          loadingElement.style.display = 'block';
-          responseElement.textContent = '';
+            loadingElement.style.display = 'block';
+            responseElement.textContent = '';
 
-          try {
-              const response = await fetch('http://localhost:3001/upload', {
-                  method: 'POST',
-                  body: formData
-              });
+            try {
+                const response = await fetch('http://localhost:3001/upload', {
+                    method: 'POST',
+                    body: formData
+                });
 
-              const result = await response.json();
-              loadingElement.style.display = 'none';
+                const result = await response.json();
+                loadingElement.style.display = 'none';
 
-              if (response.ok) {
-                  responseElement.textContent = JSON.stringify(result.response, null, 2);
-              } else {
-                  responseElement.textContent = `Error: ${result.error}`;
-              }
-          } catch (error) {
-              loadingElement.style.display = 'none';
-              responseElement.textContent = `Error: ${error.message}`;
-          }
-      });
-  </script>
+                if (response.ok) {
+                    const { atsScore, missingKeywords, suggestions, summary } = result;
+                    responseElement.textContent = `
+                         ${atsScore}
+
+                         ${missingKeywords}
+
+                        ${suggestions}
+
+                         ${summary}
+                    `;
+                } else {
+                    responseElement.textContent = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                loadingElement.style.display = 'none';
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
 </body>
 </html>

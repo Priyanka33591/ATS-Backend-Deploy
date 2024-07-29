@@ -41,41 +41,60 @@ app.post('/upload', upload.single('resume'), async (req, res) => {
     const dataBuffer = fs.readFileSync(resumePath);
     const pdfText = await pdfParse(dataBuffer);
 
-    const inputPrompt = `
-   You are an experienced Application Tracking System (ATS) specializing in the technology field. Evaluate the following resume against the provided job description. Assign a percentage match and identify any missing keywords with high accuracy.
+    const atsScorePrompt = `
+      You are an experienced Application Tracking System (ATS) specializing in the technology field. 
+      Evaluate the following resume against the provided job description. Assign a percentage match.
+      Show Only ATS SCORE in Percentage
 
-Resume: ${pdfText.text}
-Job Description: ${jd}
+      Resume: ${pdfText.text}
+      Job Description: ${jd}
 
-Provide the response only its ats percentage:
-ATS Score: % /n
-AND AFTER TWO LINE GAP:/n/n/n   give a biggest white space
-
-GIVE MISSING KEYWORDS FROM THE RESUME /n/n/n
-
-GIVE SOME SUGGESTIONS TO THE USER TO IMPROVE THE RESUME IN -1 -2 LIKE POINTS /n/n/n
-
-AND THEN AFTER 2 LINE GAP GIVE THE VERY SMALL SUMMARY OF THE RESUME/n/n/n
-
-(AND ALL WITH OUT AND SPECIAL CHARACTER APART FROM (" - , . ")ONLY/n/n
-
-AND VERY IMPORTANT :  NOT MORE THAN 100 WORDS..
-AND REMOVE UNNECESSARY TEXT PARAGRAPH OR MARKS , 
-IMPORTANT - USE WHITE SPACE AND NEXT LINE IN OUTPUT 
-
+      Provide the response in the following format:
+      ATS Score: % 
     `;
+    const atsScore = await getGeminiResponse(atsScorePrompt);
 
-    const response = await getGeminiResponse(inputPrompt);
-    res.json({ response });
+    const missingKeywordsPrompt = `
+      Identify any missing keywords with high accuracy from the resume compared to the job description. show only 5 missing keywords. USE BOOLET INSTEAD OF **.
+      SHOW ONLY MOST RELVENT MISSING KEYWORDS , DEPENDS ON JOB DESCRIPTION . USE MISSING SKILLS FOR MISSING KEYWORDS DEPENDS ON JOB DESCRIPTION.
+
+      Resume: ${pdfText.text}
+      Job Description: ${jd}
+
+      Provide the response in the following format:
+      Missing Keywords:
+    `;
+    const missingKeywords = await getGeminiResponse(missingKeywordsPrompt);
+
+    const suggestionsPrompt = `
+      Give some suggestions to the user to improve the resume in  3-4 points only. IN 25 WORDS ONLY . USE BOOLET INSTEAD OF **.
+      IMPORTANT - REMOVE **
+
+      Resume: ${pdfText.text}
+      Job Description: ${jd}
+
+      Provide the response in the following format:
+      Suggestions:
+    `;
+    const suggestions = await getGeminiResponse(suggestionsPrompt);
+
+    const summaryPrompt = `
+      Give a very small summary of the resume. IN 50 WORDS
+
+      Resume: ${pdfText.text}
+
+      Provide the response in the following format:
+      Summary:
+    `;
+    const summary = await getGeminiResponse(summaryPrompt);
+
+    res.json({ atsScore, missingKeywords, suggestions, summary });
   } catch (error) {
     res.status(500).json({ error: error.message });
   } finally {
     fs.unlinkSync(resumePath);
   }
 });
-
-
-
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
